@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TradeEngine.Core": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

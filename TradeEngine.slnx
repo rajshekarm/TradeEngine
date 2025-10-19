@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="TradeEngine.APIHost/TradeEngine.APIHost.csproj" Id="ab2f8aed-1090-4447-ad91-bd068c08ade8" />
+  <Project Path="TradeEngine.Core/TradeEngine.Core.csproj" />
+  <Project Path="TradeEngine.Infrastructure/TradeEngine.Infrastructure.csproj" Id="c94a37b3-6cf2-46b7-a205-3149d9960747" />
+  <Project Path="TradeEngine.Server/TradeEngine.Server.csproj" />
+</Solution>
