@@ -7,7 +7,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddInfrastructure();
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowTradeEngineUI", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "http://localhost:3000") // React dev servers
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
@@ -15,7 +24,10 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+
 app.UseAuthorization();
+
+app.UseCors("AllowTradeEngineUI");
 
 app.MapControllers();
 
