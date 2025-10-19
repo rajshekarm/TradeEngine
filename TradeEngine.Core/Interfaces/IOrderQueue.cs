@@ -9,7 +9,8 @@ namespace TradeEngine.Core.Interfaces
 {
     public interface IOrderQueue
     {
-        void Enqueue(Order order);
-        Order? Dequeue();
+        Task EnqueueAsync(Order order, CancellationToken cancellationToken = default);
+        Task<Order?> DequeueAsync(CancellationToken cancellationToken = default);
     }
 }
+

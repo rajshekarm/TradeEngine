@@ -25,11 +25,11 @@ namespace TradeEngine.Server
                     services.AddInfrastructure();
 
                     ///Register  trading engine 
-                    services.AddSingleton<ITradeEgineServer, ITradeEgineServer>();
+                    services.AddSingleton<ITradeEngineServer, TradeEgineServer>();
 
 
                     // Run TradeEngine Server as hosted service
-                    services.AddHostedService<ITradeEgineServer>();
+                    services.AddHostedService<TradeEgineServer>();
 
 
                 })

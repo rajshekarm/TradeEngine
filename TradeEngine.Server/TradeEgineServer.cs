@@ -1,41 +1,43 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TradeEngine.Core.Interfaces;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Configuration;
+using TradeEngine.Core.Models;
 
 namespace TradeEngine.Server
 {
-    class ITradeEgineServer : BackgroundService, ITradeEngineServer
+    class TradeEgineServer : BackgroundService, ITradeEngineServer
     {
-        private readonly ILogger<ITradeEgineServer> _logger;
+        private readonly ILogger<ITradeEngineServer> _logger;
         private readonly TradeEngineServerConfiguration _config;
         private readonly IOrderQueue _orderQueue;  //
 
-        public ITradeEgineServer(ILogger<ITradeEgineServer> logger, IOptions<TradeEngineServerConfiguration> config, IOrderQueue orderQueue) { 
-            
+        public TradeEgineServer(ILogger<ITradeEngineServer> logger, IOptions<TradeEngineServerConfiguration> config, IOrderQueue orderQueue) {
+
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _config = config.Value ?? throw new ArgumentNullException(nameof(config));
-            _orderQueue = orderQueue;
+            _config = config?.Value ?? throw new ArgumentNullException(nameof(config));
+            _orderQueue = orderQueue ?? throw new ArgumentNullException(nameof(orderQueue));
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("✅ Trade Engine '{Name}' started.", _config.EngineName);
+            _logger.LogInformation("-> Trade Engine '{Name}' started.", _config.EngineName);
 
             try
             {
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    var order = _orderQueue.Dequeue();
+                    var order = await _orderQueue.DequeueAsync();
 
                     if (order != null)
                     {
-                        _logger.LogInformation("⚙️ Processing order: {Symbol} x{Qty}", order.Symbol, order.Quantity);
+                        _logger.LogInformation("-> Processing order: {Symbol} x{Qty}", order.Symbol, order.Quantity);
+                        await ProcessOrderAsync(order, stoppingToken);
                     }
                     else
                     {
@@ -47,11 +49,20 @@ namespace TradeEngine.Server
             catch (TaskCanceledException)
             {
                 // expected on shutdown, ignore
+                _logger.LogInformation("🧩 Trade Engine shutdown requested.");
             }
             finally
             {
-                _logger.LogInformation("🛑 Trade Engine stopped.");
+                _logger.LogInformation(":Trade Engine stopped.");
             }
+        }
+
+
+        private Task ProcessOrderAsync(Order order, CancellationToken token)
+        {
+            // Example of processing logic (this is where core logic goes)
+            _logger.LogInformation("💰 Executed trade for {Symbol} at {Price}", order.Symbol, order.Price);
+            return Task.CompletedTask;
         }
         public Task Run(CancellationToken cancellationToken) => ExecuteAsync(cancellationToken);
 

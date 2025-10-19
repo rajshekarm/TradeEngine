@@ -8,15 +8,16 @@ namespace TradeEngine.Infrastructure.Queues
     {
         private readonly ConcurrentQueue<Order> _queue = new();
 
-        public void Enqueue(Order order)
+        public Task EnqueueAsync(Order order, CancellationToken cancellationToken = default)
         {
             _queue.Enqueue(order);
+            return Task.CompletedTask;
         }
 
-        public Order? Dequeue()
+        public Task<Order?> DequeueAsync(CancellationToken cancellationToken = default)
         {
             _queue.TryDequeue(out var order);
-            return order;
+            return Task.FromResult(order);
         }
     }
 }

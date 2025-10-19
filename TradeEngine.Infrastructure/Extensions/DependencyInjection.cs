@@ -9,7 +9,21 @@ namespace TradeEngine.Infrastructure.Extensions
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
             // Register the in-memory queue as a singleton
-            services.AddSingleton<IOrderQueue, InMemoryOrderQueue>();
+            // services.AddSingleton<IOrderQueue, InMemoryOrderQueue>();
+
+
+            /*Registering RabbitMQ AS messaging Queue*/
+            //var queue = RabbitMqOrderQueue.CreateAsync().Result;
+            //services.AddSingleton<IOrderQueue>(queue);
+            services.AddSingleton<IOrderQueue>(sp => RabbitMqOrderQueue.CreateAsync().GetAwaiter().GetResult());
+
+            
+
+
+
+
+
+
 
             // Later, you can also register:
             // services.AddLogging();
