@@ -14,8 +14,8 @@ namespace TradeEngine.Infrastructure.Queues
 
         private RabbitMqOrderQueue(IConnection connection, IChannel channel)
         {
-            _connection = connection;
-            _channel = channel;
+            _connection = connection ?? throw new ArgumentNullException(nameof(connection));
+            _channel = channel ?? throw new ArgumentNullException(nameof(channel));
         }
 
         public static async Task<RabbitMqOrderQueue> CreateAsync()
@@ -23,6 +23,7 @@ namespace TradeEngine.Infrastructure.Queues
             var factory = new ConnectionFactory
             {
                 HostName = "localhost",
+                Port = 5669,
                 UserName = "guest",
                 Password = "guest"
             };
@@ -45,7 +46,7 @@ namespace TradeEngine.Infrastructure.Queues
             var json = JsonSerializer.Serialize(order); 
             var body = Encoding.UTF8.GetBytes(json);
             var props = new BasicProperties { Persistent = true };
-            await _channel.BasicPublishAsync<BasicProperties>(exchange: "", routingKey: QueueName, mandatory: false, basicProperties: null, body: body);
+            await _channel.BasicPublishAsync(exchange: "", routingKey: QueueName, mandatory: false, basicProperties: props, body: body);
         }
 
         public async Task<Order?> DequeueAsync(CancellationToken cancellationToken = default)
